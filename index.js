@@ -10,3 +10,16 @@ const port = 3000;
 
 app.use(express.json());
 app.use(express.urlencoded({ extended: true }));
+// ================== CONNECT DATABASE ==================
+const db = mysql.createConnection({
+  host: 'localhost',
+  user: 'root',
+  password: 'Itam4869',
+  database: 'jihoon',
+  port: 3307
+});
+
+db.connect((err) => {
+  if (err) console.error('❌ DB ERROR:', err);
+  else console.log('✅ DB Connected (jihoon)');
+});
