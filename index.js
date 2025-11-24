@@ -168,3 +168,59 @@ app.get('/admin/api', authAdmin, (req, res) => {
 });
 
 // 
+=======================================================
+//                VALIDASI API KEY (PUBLIC)
+// =======================================================
+app.post('/validate-api', (req, res) => {
+  const { apiKey } = req.body;
+
+  db.query('SELECT * FROM api WHERE `key` = ? AND outOfDate > NOW()', [apiKey], (err, rows) => {
+    if (err) return res.status(500).json({ message: 'Gagal validasi' });
+
+    if (rows.length > 0)
+      res.json({ valid: true, message: 'API key valid & aktif' });
+    else
+      res.json({ valid: false, message: 'API key invalid / expired' });
+  });
+});
+
+// =======================================================
+//                DELETE USER + API KEY
+// =======================================================
+app.delete('/admin/users/:idUser', authAdmin, (req, res) => {
+  const { idUser } = req.params;
+
+  db.query('DELETE FROM api WHERE idUser = ?', [idUser], (err) => {
+    if (err) return res.status(500).json({ message: 'Gagal hapus API user' });
+
+    db.query('DELETE FROM user WHERE idUser = ?', [idUser], (err2) => {
+      if (err2) return res.status(500).json({ message: 'Gagal hapus user' });
+
+      res.json({ message: 'User + semua API key terhapus' });
+    });
+  });
+});
+
+// =======================================================
+//                  DELETE API KEY SAJA
+// =======================================================
+app.delete('/admin/api/:idApi', authAdmin, (req, res) => {
+  db.query('DELETE FROM api WHERE idApi = ?', [req.params.idApi], (err) => {
+    if (err) return res.status(500).json({ message: 'Gagal hapus API key' });
+
+    res.json({ message: 'API key berhasil dihapus' });
+  });
+});
+
+// =======================================================
+//        STATIC FILES DITEMPATKAN PALING TERAKHIR
+// =======================================================
+app.use(express.static(path.join(__dirname, 'public')));
+
+
+// =======================================================
+//                     RUN SERVER
+// =======================================================
+app.listen(port, () => {
+  console.log(`🚀 Server running at http://localhost:${port}`);
+});
