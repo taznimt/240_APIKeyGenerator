@@ -23,3 +23,24 @@ db.connect((err) => {
   if (err) console.error('❌ DB ERROR:', err);
   else console.log('✅ DB Connected (jihoon)');
 });
+// ================== JWT SECRET ==================
+const JWT_SECRET = 'rahasia-super-aman';
+
+// ================== MIDDLEWARE AUTH ==================
+function authAdmin(req, res, next) {
+  const authHeader = req.headers['authorization'] || '';
+  const token = authHeader.split(' ')[1];
+
+  if (!token) return res.status(401).json({ message: 'Token tidak ada' });
+
+  jwt.verify(token, JWT_SECRET, (err, decoded) => {
+    if (err) return res.status(401).json({ message: 'Token tidak valid' });
+    req.admin = decoded;
+    next();
+  });
+}
+
+// ================== GENERATE API KEY ==================
+function generateApiKey() {
+  return "API-" + crypto.randomBytes(16).toString('hex').toUpperCase();
+}
