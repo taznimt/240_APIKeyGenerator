@@ -671,3 +671,237 @@
       }
 
     });
+    // Dashboard muncul
+
+    function showDashboard() {
+
+      authSection.style.display = 'none';
+
+      dashboardSection.style.display = 'block';
+
+      tokenDisplay.textContent = 'Token: ' + token;
+
+    }
+
+
+
+    
+
+
+
+    logoutLink.addEventListener('click', (e) => {
+
+      e.preventDefault();
+
+      token = null;
+
+      localStorage.removeItem('adminToken');
+
+      dashboardSection.style.display = 'none';
+
+      authSection.style.display = 'block';
+
+      setMode('login');
+
+    });
+
+
+
+    // ============= LOAD USERS DENGAN TOMBOL HAPUS =============
+
+    document.getElementById('btnLoadUsers').addEventListener('click', async () => {
+
+      if (!token) return alert("Belum login!");
+
+
+
+      const res = await fetch('/admin/users', {
+
+        headers: { 'Authorization': 'Bearer ' + token }
+
+      });
+
+      const data = await res.json();
+
+
+
+      let html = '<table><tr><th>ID</th><th>Nama</th><th>Email</th><th>Aksi</th></tr>';
+
+      data.forEach(u => {
+
+        html += `<tr>
+
+          <td>${u.idUser}</td>
+
+          <td>${u.firstname} ${u.lastname}</td>
+
+          <td>${u.email}</td>
+
+          <td>
+
+            <button class="small-btn btn-danger" onclick="deleteUser(${u.idUser})">Hapus</button>
+
+          </td>
+
+        </tr>`;
+
+      });
+
+      html += '</table>';
+
+
+
+      usersTableDiv.innerHTML = html;
+
+    });
+
+
+
+    // ============= LOAD API KEY DENGAN TOMBOL HAPUS ==========
+
+    document.getElementById('btnLoadApi').addEventListener('click', async () => {
+
+      if (!token) return alert("Belum login!");
+
+
+
+      const res = await fetch('/admin/api', {
+
+        headers: { 'Authorization': 'Bearer ' + token }
+
+      });
+
+      const data = await res.json();
+
+
+
+      let html = '<table><tr><th>ID</th><th>User</th><th>Key</th><th>OutOfDate</th><th>Status</th><th>Aksi</th></tr>';
+
+      data.forEach(a => {
+
+        const statusClass = a.status === 'ON' ? 'status-on' : 'status-off';
+
+        html += `<tr>
+
+          <td>${a.idApi}</td>
+
+          <td>${a.firstname} ${a.lastname}</td>
+
+          <td>${a.key}</td>
+
+          <td>${a.outOfDate}</td>
+
+          <td class="${statusClass}">${a.status}</td>
+
+          <td>
+
+            <button class="small-btn btn-danger" onclick="deleteApi(${a.idApi})">Hapus</button>
+
+          </td>
+
+        </tr>`;
+
+      });
+
+      html += '</table>';
+
+
+
+      apiTableDiv.innerHTML = html;
+
+    });
+
+
+
+    // ============= FUNGSI HAPUS =============
+
+    async function deleteUser(idUser) {
+
+      if (!token) return alert('Belum login!');
+
+      if (!confirm('Yakin ingin menghapus user ini BESERTA semua API key-nya?')) return;
+
+
+
+      try {
+
+        const res = await fetch(`/admin/users/${idUser}`, {
+
+          method: 'DELETE',
+
+          headers: { 'Authorization': 'Bearer ' + token }
+
+        });
+
+        const data = await res.json();
+
+        alert(data.message || 'Berhasil menghapus user');
+
+
+
+        // refresh tabel
+
+        document.getElementById('btnLoadUsers').click();
+
+        document.getElementById('btnLoadApi').click();
+
+      } catch (err) {
+
+        alert('Error: ' + err.message);
+
+      }
+
+    }
+
+
+
+    async function deleteApi(idApi) {
+
+      if (!token) return alert('Belum login!');
+
+      if (!confirm('Yakin ingin menghapus API key ini?')) return;
+
+
+
+      try {
+
+        const res = await fetch(`/admin/api/${idApi}`, {
+
+          method: 'DELETE',
+
+          headers: { 'Authorization': 'Bearer ' + token }
+
+        });
+
+        const data = await res.json();
+
+        alert(data.message || 'Berhasil menghapus API key');
+
+
+
+        // refresh tabel api
+
+        document.getElementById('btnLoadApi').click();
+
+      } catch (err) {
+
+        alert('Error: ' + err.message);
+
+      }
+
+    }
+
+
+
+    // biar bisa dipanggil dari onclick
+
+    window.deleteUser = deleteUser;
+
+    window.deleteApi = deleteApi;
+
+  </script>
+
+</body>
+
+</html>
+
