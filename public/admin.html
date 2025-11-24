@@ -1,0 +1,673 @@
+<!DOCTYPE html>
+
+<html lang="id">
+
+<head>
+
+  <meta charset="UTF-8">
+
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+
+  <title>Admin Auth</title>
+
+  <style>
+
+    * { box-sizing: border-box; }
+
+
+
+    body {
+
+      margin: 0;
+
+      padding: 0;
+
+      font-family: 'Poppins', sans-serif;
+
+      background: linear-gradient(135deg, #87CEFA, #FF69B4);
+
+      min-height: 100vh;
+
+      display: flex;
+
+      justify-content: center;
+
+      align-items: center;
+
+    }
+
+
+
+    .card {
+
+      background: rgba(255, 255, 255, 0.97);
+
+      border-radius: 16px;
+
+      box-shadow: 0 18px 45px rgba(0, 0, 0, 0.35);
+
+      width: 100%;
+
+      max-width: 650px;
+
+      padding: 32px 40px 28px;
+
+    }
+
+
+
+    h2 {
+
+      text-align: center;
+
+      margin: 0 0 4px;
+
+      color: #26235c;
+
+    }
+
+
+
+    .subtitle {
+
+      text-align: center;
+
+      font-size: 13px;
+
+      color: #666;
+
+      margin-bottom: 20px;
+
+    }
+
+
+
+    label {
+
+      display: block;
+
+      font-size: 13px;
+
+      margin-bottom: 4px;
+
+      color: #444;
+
+    }
+
+
+
+    input {
+
+      width: 100%;
+
+      padding: 10px;
+
+      margin-bottom: 12px;
+
+      border-radius: 8px;
+
+      border: 1px solid #d0d0d0;
+
+      font-size: 14px;
+
+      background: #fffef7;
+
+    }
+
+
+
+    input:focus {
+
+      outline: none;
+
+      border-color: #7f5af0;
+
+      box-shadow: 0 0 0 2px rgba(127, 90, 240, 0.2);
+
+    }
+
+
+
+    button {
+
+      width: 100%;
+
+      padding: 10px;
+
+      border-radius: 999px;
+
+      border: none;
+
+      cursor: pointer;
+
+      font-size: 14px;
+
+      font-weight: 600;
+
+      background: linear-gradient(135deg, #6a11cb, #ff6ad5);
+
+      color: #fff;
+
+      margin-top: 4px;
+
+      margin-bottom: 10px;
+
+      transition: transform 0.15s ease, box-shadow 0.15s ease, opacity 0.15s ease;
+
+      box-shadow: 0 10px 30px rgba(127, 90, 240, 0.4);
+
+    }
+
+
+
+    button:hover {
+
+      opacity: 0.96;
+
+      transform: translateY(-1px);
+
+      box-shadow: 0 14px 40px rgba(127, 90, 240, 0.55);
+
+    }
+
+
+
+    .small-btn {
+
+      width: auto;
+
+      padding-inline: 14px;
+
+      border-radius: 999px;
+
+      font-size: 12px;
+
+      margin-bottom: 4px;
+
+    }
+
+
+
+    .btn-danger {
+
+      background: linear-gradient(135deg, #e53935, #ff7043);
+
+      box-shadow: none;
+
+      color: #fff;
+
+    }
+
+
+
+    .btn-danger:hover {
+
+      opacity: 0.95;
+
+      transform: translateY(-1px);
+
+    }
+
+
+
+    .link-row {
+
+      text-align: center;
+
+      font-size: 12px;
+
+      color: #666;
+
+      margin-top: 6px;
+
+    }
+
+
+
+    .link-row a {
+
+      color: #7f5af0;
+
+      cursor: pointer;
+
+      text-decoration: none;
+
+      font-weight: 500;
+
+    }
+
+
+
+    .link-row a:hover { text-decoration: underline; }
+
+
+
+    .back-link {
+
+      margin-top: 10px;
+
+      text-align: center;
+
+      font-size: 12px;
+
+    }
+
+
+
+    .back-link a {
+
+      color: #999;
+
+      text-decoration: none;
+
+    }
+
+
+
+    .back-link a:hover { text-decoration: underline; }
+
+
+
+    .message {
+
+      font-size: 12px;
+
+      margin-top: 6px;
+
+      color: #444;
+
+      white-space: pre-wrap;
+
+      word-break: break-all;
+
+    }
+
+
+
+    .message.error { color: #c62828; }
+
+    .message.success { color: #2e7d32; }
+
+
+
+    /* DASHBOARD STYLE */
+
+    .token-text {
+
+      font-size: 11px;
+
+      color: #777;
+
+      margin-bottom: 8px;
+
+      word-break: break-all;
+
+    }
+
+
+
+    .section-title {
+
+      font-size: 14px;
+
+      font-weight: 600;
+
+      margin-top: 10px;
+
+      margin-bottom: 6px;
+
+      color: #26235c;
+
+    }
+
+
+
+    table {
+
+      width: 100%;
+
+      border-collapse: collapse;
+
+      font-size: 11px;
+
+      margin-top: 4px;
+
+      table-layout: auto;
+
+    }
+
+
+
+    th, td {
+
+      border: 1px solid #ddd;
+
+      padding: 3px 4px;
+
+      text-align: left;
+
+      vertical-align: middle;
+
+    }
+
+
+
+    th {
+
+      background: #f4f0ff;
+
+      font-weight: 600;
+
+    }
+
+
+
+    td:last-child {
+
+      white-space: nowrap;
+
+      text-align: center;
+
+    }
+
+
+
+    .status-on { color: #2e7d32; font-weight: 600; }
+
+    .status-off { color: #c62828; font-weight: 600; }
+
+  </style>
+
+</head>
+
+<body>
+
+  <div class="card">
+
+    <!-- ============= AUTH (REGISTER / LOGIN) ============= -->
+
+    <div id="authSection">
+
+      <h2 id="authTitle">Register Admin</h2>
+
+      <div class="subtitle" id="authSubtitle">
+
+        Buat akun admin untuk mengelola user &amp; API key.
+
+      </div>
+
+
+
+      <form id="authForm">
+
+        <label for="email">Email:</label>
+
+        <input type="email" id="email" required placeholder="contoh@mail.com">
+
+
+
+        <label for="password">Password:</label>
+
+        <input type="password" id="password" required placeholder="Minimal 6 karakter">
+
+
+
+        <button type="submit" id="authButton">Daftar</button>
+
+      </form>
+
+
+
+      <div class="message" id="authMessage"></div>
+
+
+
+      <div class="link-row">
+
+        <span id="toggleText">Sudah punya akun admin?</span>
+
+        <a id="toggleLink">Masuk sekarang</a>
+
+      </div>
+
+
+
+      <div class="back-link">
+
+        <a href="/">← Kembali ke Register User</a>
+
+      </div>
+
+    </div>
+
+
+
+    <!-- ============= DASHBOARD (SETELAH LOGIN) ============= -->
+
+    <div id="dashboardSection" style="display:none;">
+
+      <h2>Admin Dashboard</h2>
+
+      <div class="subtitle">Anda sudah login sebagai admin.</div>
+
+
+
+      <div class="token-text" id="tokenDisplay"></div>
+
+
+
+      <div class="section-title">List User</div>
+
+      <button class="small-btn" id="btnLoadUsers">Load Users</button>
+
+      <div class="message" id="usersMsg"></div>
+
+      <div id="usersTable"></div>
+
+
+
+      <div class="section-title">List API Key</div>
+
+      <button class="small-btn" id="btnLoadApi">Load API Keys</button>
+
+      <div class="message" id="apiMsg"></div>
+
+      <div id="apiTable"></div>
+
+
+
+      <div class="back-link" style="margin-top: 12px;">
+
+        <a href="#" id="logoutLink">Keluar &amp; kembali ke Register User</a>
+
+      </div>
+
+    </div>
+
+  </div>
+
+
+
+  <script>
+
+    let mode = 'register';
+
+    let token = null;
+
+
+
+    const authSection = document.getElementById('authSection');
+
+    const dashboardSection = document.getElementById('dashboardSection');
+
+
+
+    const authTitle = document.getElementById('authTitle');
+
+    const authSubtitle = document.getElementById('authSubtitle');
+
+    const authForm = document.getElementById('authForm');
+
+    const authButton = document.getElementById('authButton');
+
+    const authMessage = document.getElementById('authMessage');
+
+    const toggleText = document.getElementById('toggleText');
+
+    const toggleLink = document.getElementById('toggleLink');
+
+
+
+    const emailInput = document.getElementById('email');
+
+    const passwordInput = document.getElementById('password');
+
+
+
+    const tokenDisplay = document.getElementById('tokenDisplay');
+
+    const usersMsg = document.getElementById('usersMsg');
+
+    const apiMsg = document.getElementById('apiMsg');
+
+    const usersTableDiv = document.getElementById('usersTable');
+
+    const apiTableDiv = document.getElementById('apiTable');
+
+    const logoutLink = document.getElementById('logoutLink');
+
+
+
+    // Mode Register / Login
+
+    function setMode(newMode) {
+
+      mode = newMode;
+
+      authMessage.textContent = '';
+
+      authMessage.className = 'message';
+
+
+
+      if (mode === 'register') {
+
+        authTitle.textContent = 'Register Admin';
+
+        authSubtitle.textContent = 'Buat akun admin untuk mengelola user & API key.';
+
+        authButton.textContent = 'Daftar';
+
+        toggleText.textContent = 'Sudah punya akun admin?';
+
+        toggleLink.textContent = 'Masuk sekarang';
+
+      } else {
+
+        authTitle.textContent = 'Login Admin';
+
+        authSubtitle.textContent = 'Masuk sebagai admin untuk melihat data.';
+
+        authButton.textContent = 'Login';
+
+        toggleText.textContent = 'Belum punya akun admin?';
+
+        toggleLink.textContent = 'Daftar sekarang';
+
+      }
+
+    }
+
+
+
+    toggleLink.addEventListener('click', () => {
+
+      setMode(mode === 'register' ? 'login' : 'register');
+
+    });
+
+
+
+    // Submit form register / login
+
+    authForm.addEventListener('submit', async (e) => {
+
+      e.preventDefault();
+
+
+
+      authMessage.textContent = '';
+
+      authMessage.className = 'message';
+
+
+
+      const email = emailInput.value;
+
+      const password = passwordInput.value;
+
+
+
+      try {
+
+        const url = mode === 'register' ? '/admin/register' : '/admin/login';
+
+
+
+        const res = await fetch(url, {
+
+          method: 'POST',
+
+          headers: { 'Content-Type': 'application/json' },
+
+          body: JSON.stringify({ email, password })
+
+        });
+
+
+
+        const data = await res.json();
+
+
+
+        if (!res.ok) {
+
+          authMessage.textContent = data.message || 'Terjadi kesalahan';
+
+          authMessage.classList.add('error');
+
+          return;
+
+        }
+
+
+
+        authMessage.textContent = data.message;
+
+        authMessage.classList.add('success');
+
+
+
+        // Login sukses
+
+        if (mode === 'login' && data.token) {
+
+          token = data.token;
+
+          localStorage.setItem('adminToken', token);
+
+          showDashboard();
+
+        }
+
+
+
+      } catch (err) {
+
+        authMessage.textContent = 'Error: ' + err.message;
+
+        authMessage.classList.add('error');
+
+      }
+
+    });
