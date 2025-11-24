@@ -136,3 +136,201 @@ app.post('/admin/login', (req, res) => {
     });
   });
 });
+// =======================================================
+//                     GET USERS (ADMIN)
+// =======================================================
+app.get('/admin/users', authAdmin, (req, res) => {
+  const sql = 'SELECT idUser, firstname, lastname, email FROM user';
+  db.query(sql, (err, rows) => {
+    if (err) return res.status(500).json({ message: 'Gagal mengambil data user' });
+    res.json(rows);
+  });
+});
+
+// =======================================================
+//                     GET API KEYS (ADMIN)
+// =======================================================
+app.get('/admin/api', authAdmin, (req, res) => {
+  const sql = `
+    SELECT a.idApi, a.key, a.outOfDate, u.firstname, u.lastname, u.email
+    FROM api a
+    JOIN user u ON u.idUser = a.idUser
+  `;
+
+  db.query(sql, (err, rows) => {
+    if (err) return res.status(500).json({ message: 'Gagal mengambil data api' });
+
+    const now = new Date();
+    rows.forEach(r => {
+      r.status = new Date(r.outOfDate) > now ? 'ON' : 'OFF';
+    });
+
+    res.json(rows);
+  });
+});
+
+// <!DOCTYPE html>
+<html lang="id">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Register User & API Key</title>
+  <style>
+    * { box-sizing: border-box; }
+
+    body {
+      margin: 0;
+      padding: 0;
+      font-family: 'Poppins', sans-serif;
+      background: linear-gradient(135deg, #6a11cb, #8e2de2);
+      min-height: 100vh;
+      display: flex;
+      justify-content: center;
+      align-items: center;
+      padding: 40px 10px;
+    }
+
+    .container {
+      background: white;
+      padding: 30px;
+      border-radius: 16px;
+      box-shadow: 0 6px 20px rgba(0, 0, 0, 0.2);
+      width: 100%;
+      max-width: 450px;
+    }
+
+    h2 {
+      color: #6a11cb;
+      margin-top: 0;
+      margin-bottom: 20px;
+      text-align: center;
+    }
+
+    label {
+      font-size: 13px;
+      font-weight: 500;
+      display: block;
+      margin-bottom: 4px;
+    }
+
+    input {
+      width: 100%;
+      padding: 10px;
+      margin-bottom: 12px;
+      border-radius: 8px;
+      border: 1px solid #ccc;
+      font-size: 14px;
+    }
+
+    input[readonly] {
+      background: #f3f3ff;
+      font-weight: bold;
+    }
+
+    .row {
+      display: flex;
+      gap: 8px;
+      align-items: center;
+      margin-bottom: 12px;
+    }
+
+    button {
+      background: linear-gradient(45deg, #6a11cb, #8e2de2);
+      color: white;
+      border: none;
+      padding: 10px 16px;
+      border-radius: 8px;
+      cursor: pointer;
+      font-size: 14px;
+      transition: 0.3s;
+    }
+
+    button:hover { opacity: 0.9; }
+
+    .btn-secondary {
+      background: white;
+      color: #6a11cb;
+      border: 1px solid #6a11cb;
+    }
+
+    .btn-secondary:hover {
+      background: #6a11cb;
+      color: white;
+    }
+
+    .top-bar {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      margin-bottom: 16px;
+    }
+
+    .top-bar span {
+      font-size: 13px;
+      color: #555;
+    }
+  </style>
+</head>
+<body>
+  <div class="container">
+    <div class="top-bar">
+      <span>Form Registrasi User</span>
+      <button class="btn-secondary" type="button" onclick="window.location.href='/admin.html'">Admin</button>
+    </div>
+    <h2>Register User & API Key</h2>
+
+    <form id="userForm">
+      <label for="apiKey">API Key (otomatis)</label>
+      <div class="row">
+        <input type="text" id="apiKey" readonly placeholder="Akan muncul setelah register">
+      </div>
+
+      <label for="firstname">First Name</label>
+      <input type="text" id="firstname" required>
+
+      <label for="lastname">Last Name</label>
+      <input type="text" id="lastname" required>
+
+      <label for="email">Email</label>
+      <input type="email" id="email" required>
+
+      <button type="submit">Register User</button>
+    </form>
+
+  </div>
+
+  <script>
+    const form = document.getElementById('userForm');
+    const apiKeyInput = document.getElementById('apiKey');
+
+    form.addEventListener('submit', async (e) => {
+      e.preventDefault();
+
+      const firstname = document.getElementById('firstname').value;
+      const lastname = document.getElementById('lastname').value;
+      const email = document.getElementById('email').value;
+
+      try {
+        const res = await fetch('/register-user', {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify({ firstname, lastname, email })
+        });
+
+        const data = await res.json();
+
+        // Hanya tampilkan API key
+        if (data.apiKey) {
+          apiKeyInput.value = data.apiKey;
+          alert("User berhasil dibuat!\nAPI Key: " + data.apiKey);
+        } else {
+          alert("Terjadi kesalahan: " + (data.message || "Unknown error"));
+        }
+
+      } catch (err) {
+        alert("Error: " + err.message);
+      }
+    });
+  </script>
+</body>
+</html>
