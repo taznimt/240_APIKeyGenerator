@@ -10,6 +10,7 @@ const port = 3000;
 
 app.use(express.json());
 app.use(express.urlencoded({ extended: true }));
+
 // ================== CONNECT DATABASE ==================
 const db = mysql.createConnection({
   host: 'localhost',
@@ -23,6 +24,7 @@ db.connect((err) => {
   if (err) console.error('❌ DB ERROR:', err);
   else console.log('✅ DB Connected (jihoon)');
 });
+
 // ================== JWT SECRET ==================
 const JWT_SECRET = 'rahasia-super-aman';
 
@@ -44,6 +46,7 @@ function authAdmin(req, res, next) {
 function generateApiKey() {
   return "API-" + crypto.randomBytes(16).toString('hex').toUpperCase();
 }
+
 // =======================================================
 //                     USER REGISTER
 // =======================================================
@@ -167,8 +170,7 @@ app.get('/admin/api', authAdmin, (req, res) => {
   });
 });
 
-// 
-=======================================================
+// =======================================================
 //                VALIDASI API KEY (PUBLIC)
 // =======================================================
 app.post('/validate-api', (req, res) => {
